@@ -7,8 +7,9 @@
 
 import UIKit
 
-class MainViewController: UIViewController {
+final class MainViewController: UIViewController {
 
+  // MARK: View Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .systemOrange
