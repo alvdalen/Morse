@@ -26,7 +26,7 @@ extension SceneDelegate: UIWindowSceneDelegate {
 private extension SceneDelegate {
   func configWindow(with scene: UIScene) {
     guard let windowScene = scene as? UIWindowScene else { return }
-    let viewController = MainViewController()
+    let viewController = ViewController()
     window = UIWindow(windowScene: windowScene)
     window?.windowScene = windowScene
     window?.rootViewController = viewController

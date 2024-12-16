@@ -1,5 +1,5 @@
 //
-//  MainViewController.swift
+//  ViewController.swift
 //  Morse
 //
 //  Created by Адам Мирзаканов on 14.12.2024.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MainViewController: UIViewController {
+final class ViewController: BaseViewController<ViewControllerRootView> {
   // MARK: View Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
