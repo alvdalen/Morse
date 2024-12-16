@@ -30,6 +30,7 @@ private extension SceneDelegate {
     window = UIWindow(windowScene: windowScene)
     window?.windowScene = windowScene
     window?.rootViewController = viewController
+    window?.overrideUserInterfaceStyle = .dark
     window?.makeKeyAndVisible()
   }
 }
