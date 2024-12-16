@@ -11,7 +11,7 @@ class BaseRootView: UIView {
   // MARK: Initializers
   init() {
     super.init(frame: .zero)
-    setupViews()
+    initViews()
   }
   
   required init?(coder: NSCoder) {
@@ -20,7 +20,7 @@ class BaseRootView: UIView {
   
   // MARK: Internal Methods
   /// Подклассы должны переопределять этот метод.
-  func setupViews() {
-    backgroundColor = .systemBackground
+  func initViews() {
+//    backgroundColor = .systemBackground
   }
 }
