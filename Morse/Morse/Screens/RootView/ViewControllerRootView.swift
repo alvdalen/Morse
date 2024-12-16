@@ -7,19 +7,6 @@
 
 import UIKit
 
-enum Const {
-  static let placeholderTextViewFont = UIFont(name: "Courier", size: 40)
-  static let placeholderText: String = "Write..."
-  static let stackViewTopInset: CGFloat = 15.0
-  static let stackViewHorizontalInset: CGFloat = 20.0
-  static let stackViewWidthAdjustment: CGFloat = -40.0
-  static let duration: CGFloat = 0.08
-  static let pressingPlayButtonScale: CGFloat = 0.9
-  static let playButtonScale: CGFloat = 1.0
-  static let lineHeight: CGFloat = 1.0
-  static let lineColor: UIColor = .systemGray
-}
-
 protocol RootViewDelegate: AnyObject {
   func playButtonTapped(message: MorseCodeMessage)
 }
@@ -39,22 +26,22 @@ final class ViewControllerRootView: BaseRootView {
     $0.backgroundColor = .clear
     $0.textColor = .systemGray
     $0.tintColor = .systemGray
-    $0.autocapitalizationType = .allCharacters  
+    $0.autocapitalizationType = .allCharacters
     $0.autocorrectionType = .no
     return $0
   }(PlaceholderTextView())
   
   private let playMessageButton: UIButton = {
-    $0.setTitle("Message", for: .normal)
+    $0.setTitle(Const.playMessageButtonTitleText, for: .normal)
     $0.setTitleColor(.systemGray, for: .normal)
-    $0.titleLabel?.font = UIFont(name: "Courier", size: 30)
-    $0.backgroundColor = .black
-    $0.layer.cornerRadius = 10.0
+    $0.titleLabel?.font = Const.playMessageButtonFont
+    $0.backgroundColor = Const.playMessageButtonColor
+    $0.layer.cornerRadius = Const.playMessageButtonCornerRadius
     return $0
   }(UIButton())
   
   private lazy var lineView: UIView = {
-    $0.backgroundColor = Const.lineColor
+    $0.backgroundColor = Const.lightMainColor
     $0.heightAnchor.constraint(
       equalToConstant: Const.lineHeight / traitCollection.displayScale
     ).isActive = true
@@ -62,13 +49,13 @@ final class ViewControllerRootView: BaseRootView {
   }(UIView())
   
   private lazy var anchorImageView: UIImageView = {
-    $0.image = UIImage(named: "Anchors")
+    $0.image = Const.anchorImage
     $0.contentMode = .scaleAspectFit
     $0.heightAnchor.constraint(
-      equalToConstant: 100
+      equalToConstant: Const.anchorImageViewSize
     ).isActive = true
     $0.widthAnchor.constraint(
-      equalToConstant: 100
+      equalToConstant: Const.anchorImageViewSize
     ).isActive = true
     return $0
   }(UIImageView())
@@ -77,7 +64,7 @@ final class ViewControllerRootView: BaseRootView {
     $0.axis = .vertical
     $0.alignment = .center
     $0.alignment = .fill
-    $0.spacing = 10
+    $0.spacing = Const.textViewStackViewSpacing
     $0.addArrangedSubview(messageTextView)
     $0.addArrangedSubview(lineView)
     return $0
@@ -87,7 +74,7 @@ final class ViewControllerRootView: BaseRootView {
     $0.axis = .vertical
     $0.alignment = .center
     $0.alignment = .fill
-    $0.spacing = 30
+    $0.spacing = Const.mainStackViewSpacing
     $0.addArrangedSubview(textViewStackView)
     $0.addArrangedSubview(playMessageButton)
     $0.addArrangedSubview(anchorImageView)
@@ -105,21 +92,23 @@ final class ViewControllerRootView: BaseRootView {
     addSubviews()
     setConstranits()
     setupPlayButton()
-    backgroundColor = .tertiarySystemBackground
+    backgroundColor = Const.rootViewBackgroundColor
   }
-  
-  // MARK: Private Methods
-  private func addSubviews() {
+}
+
+// MARK: - Private Methods
+private extension ViewControllerRootView {
+  func addSubviews() {
     addSubview(scrollView)
     scrollView.addSubview(mainStackView)
   }
   
-  private func setConstranits() {
+  func setConstranits() {
     setScrollViewConstraints()
     setMainStackViewConstraints()
   }
   
-  private func setScrollViewConstraints() {
+  func setScrollViewConstraints() {
     scrollView.setConstraints(
       top: safeAreaLayoutGuide.topAnchor,
       bottom: safeAreaLayoutGuide.bottomAnchor,
@@ -128,7 +117,7 @@ final class ViewControllerRootView: BaseRootView {
     )
   }
   
-  private func setMainStackViewConstraints() {
+  func setMainStackViewConstraints() {
     mainStackView.centerXY()
     mainStackView.widthAnchor.constraint(
       equalTo: scrollView.widthAnchor,
@@ -136,37 +125,41 @@ final class ViewControllerRootView: BaseRootView {
     ).isActive = true
   }
   
-  // MARK: Private Methods
-  private func scheduleColorChange(
+  func scheduleTimer(
     for event: MorseCodePlaybackEvent,
-    at timeInterval: TimeInterval
+    at startTimeInterval: TimeInterval
   ) {
-    let color = colorForEvent(event)
     Timer.scheduledTimer(
-      withTimeInterval: timeInterval,
-      repeats: false) { _ in
-        self.backgroundColor = color
+      withTimeInterval: startTimeInterval,
+      repeats: false) { [weak self] _ in
+        guard let self = self else { return }
+        self.applyStyle(for: event)
       }
   }
   
-  private func colorForEvent(_ event: MorseCodePlaybackEvent) -> UIColor {
+  func applyStyle(for event: MorseCodePlaybackEvent) {
     switch event {
     case .off:
-      return .black
+      self.backgroundColor = Const.rootViewBackgroundColor
+      self.messageTextView.textColor = Const.lightMainColor
+      self.lineView.backgroundColor = Const.darkMainColor
     case .on:
-      return .systemRed
+      self.backgroundColor = Const.lightMainColor
+      self.messageTextView.textColor = Const.rootViewBackgroundColor
+      self.lineView.backgroundColor = Const.darkMainColor
     }
   }
   
-  private func scheduleResetColor(at timeInterval: TimeInterval) {
+  func scheduleFinalResetTimer(at timeInterval: TimeInterval) {
     Timer.scheduledTimer(
       withTimeInterval: timeInterval,
-      repeats: false) { _ in
-        self.backgroundColor = .black
+      repeats: false) { [weak self] _ in
+        guard let self = self else { return }
+        self.backgroundColor = Const.rootViewBackgroundColor
       }
   }
   
-  private func setupPlayButton() {
+  func setupPlayButton() {
     playMessageButton.addTarget(
       self,
       action: #selector(playButtonTapped),
@@ -174,14 +167,13 @@ final class ViewControllerRootView: BaseRootView {
     )
   }
   
-  @objc private func playButtonTapped(_ sender: UIButton) {
-    guard let message = MorseCodeMessage(message: messageTextView.text ?? "")
+  @objc func playButtonTapped(_ sender: UIButton) {
+    guard let message = MorseCodeMessage(message: messageTextView.text ?? .empty)
     else { return }
     messageTextView.resignFirstResponder()
     animatePlayButton(sender)
     delegate?.playButtonTapped(message: message)
   }
-  
   
   func animatePlayButton(_ sender: UIButton) {
     UIView.animate(withDuration: Const.duration) { [weak self] in
@@ -213,43 +205,11 @@ final class ViewControllerRootView: BaseRootView {
 // MARK: - MorseCodePlayer
 extension ViewControllerRootView: MorseCodePlayer {
   func play(message: MorseCodeMessage) throws {
-    
-    // время через которое экран меняет цвет
     var startTimeInterval: TimeInterval = .zero
-    
-    message.playbackEvents.forEach {
-      switch $0 {
-      case .off:
-        Timer.scheduledTimer(
-          withTimeInterval: startTimeInterval,
-          repeats: false) { _ in
-            self.backgroundColor = .tertiarySystemBackground
-//            self.messageTextView.backgroundColor = .tertiarySystemBackground
-            self.messageTextView.textColor = .systemGray
-            self.lineView.backgroundColor = Const.lineColor
-          }
-      case .on:
-        Timer.scheduledTimer(
-          withTimeInterval: startTimeInterval,
-          repeats: false) { _ in
-            self.backgroundColor = .systemGray
-//            self.messageTextView.backgroundColor = .systemGray
-            self.messageTextView.textColor = .tertiarySystemBackground
-            self.lineView.backgroundColor = .systemGray3
-          }
-      }
-      // таймер стартует без задержки startTimeInterval = 0
-      // после каждого шага к startTimeInterval прибавляется время которое прошло
-      // для того что бы смена цвета произошла с учетом пройденного времени
-      startTimeInterval += $0.duration
-      
-      // цвет на котором все закончится (вернуться к исходному)
-      Timer.scheduledTimer(
-        withTimeInterval: startTimeInterval,
-        repeats: false
-      ) { _ in
-        self.backgroundColor = .tertiarySystemBackground
-      }
+    message.playbackEvents.forEach { event in
+      scheduleTimer(for: event, at: startTimeInterval)
+      startTimeInterval += event.duration
     }
+    scheduleFinalResetTimer(at: startTimeInterval)
   }
 }
