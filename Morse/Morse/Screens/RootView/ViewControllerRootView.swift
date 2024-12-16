@@ -28,6 +28,7 @@ final class ViewControllerRootView: BaseRootView {
     $0.tintColor = .systemGray
     $0.autocapitalizationType = .allCharacters
     $0.autocorrectionType = .no
+    $0.keyboardType = .asciiCapable
     return $0
   }(PlaceholderTextView())
   

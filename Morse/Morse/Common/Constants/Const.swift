@@ -11,6 +11,7 @@ enum Const {
   static let placeholderText: String = "Write..."
   static let playMessageButtonTitleText: String = "Message"
   static let mainFontName: String = "Courier"
+  static let morse: String = "-- --- .-. ... ."
   
   static let playMessageButtonFont = UIFont(name: mainFontName, size: 30.0)
   static let placeholderTextViewFont = UIFont(name: mainFontName, size: 40.0)
